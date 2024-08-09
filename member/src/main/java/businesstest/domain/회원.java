@@ -51,29 +51,22 @@ public class 회원 {
 
     //<<< Clean Arch / Port Method
     public static void addPoint(PaymentCreated paymentCreated) {
-        //implement business logic here:
-
-        /** Example 1:  new item 
-        회원 회원 = new 회원();
-        repository().save(회원);
-
-        AddPoint addPoint = new AddPoint(회원);
-        addPoint.publishAfterCommit();
-        */
-
-        /** Example 2:  finding and process
-        
-        repository().findById(paymentCreated.get???()).ifPresent(회원->{
-            
-            회원 // do something
-            repository().save(회원);
-
-            AddPoint addPoint = new AddPoint(회원);
-            addPoint.publishAfterCommit();
-
-         });
-        */
-
+        repository()
+            .findById(paymentCreated.getPaymentId())
+            .ifPresent(회원 -> {
+                long pointToAdd = 0L;
+                if (paymentCreated.getPaymentAmount() <= 10000) {
+                    pointToAdd = paymentCreated.getPaymentAmount() * 3 / 100;
+                } else if (paymentCreated.getPaymentAmount() <= 50000) {
+                    pointToAdd = paymentCreated.getPaymentAmount() * 5 / 100;
+                } else if (paymentCreated.getPaymentAmount() > 50000) {
+                    pointToAdd = paymentCreated.getPaymentAmount() * 10 / 100;
+                }
+                회원.setPoint(회원.getPoint() + pointToAdd);
+                repository().save(회원);
+                AddPoint addPoint = new AddPoint(회원);
+                addPoint.publishAfterCommit();
+            });
     }
     //>>> Clean Arch / Port Method
 

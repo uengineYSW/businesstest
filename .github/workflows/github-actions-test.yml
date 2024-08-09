@@ -1,0 +1,27 @@
+name: test
+run-name: testing 
+on: [push]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Prepare Test Environment
+      run: |
+        cd member
+        mkdir -p ignore_test_file
+        mv src/test/java/businesstest/*.java ignore_test_file/
+        mv ignore_test_file/AddPointTest.java src/test/java/businesstest/
+    - name: Compile and Run Specific Test
+      run: |
+        cd member
+        mvn test-compile
+        mvn test -Dtest=businesstest.AddPointTest
+    - name: Restore Test Files
+      if: always()
+      run: |
+        cd member
+        mv ignore_test_file/*.java src/test/java/businesstest/
+        rm -rf ignore_test_file
